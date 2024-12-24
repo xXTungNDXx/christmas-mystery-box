@@ -7,8 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
+interface Gift {
+  id: number;
+  name: string;
+  description: string;
+  probability: number;
+}
+
 const GiftAdmin = () => {
-  const [gifts, setGifts] = useState([
+  const [gifts, setGifts] = useState<Gift[]>([
     { id: 1, name: "Holiday Cruise", description: "A magical 7-day Caribbean cruise!", probability: 5 },
     { id: 2, name: "Gaming Console", description: "The latest gaming console with virtual reality!", probability: 15 },
     { id: 3, name: "Smart Home Bundle", description: "Transform your home with smart devices!", probability: 20 },
@@ -17,20 +24,20 @@ const GiftAdmin = () => {
     { id: 6, name: "Tech Gadget Set", description: "Latest smartphone and accessories!", probability: 30 }
   ]);
   
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState('');
-  const [newGift, setNewGift] = useState({
+  const [newGift, setNewGift] = useState<Omit<Gift, 'id'>>({
     name: '',
     description: '',
     probability: 0
   });
 
-  const showMessage = (msg) => {
+  const showMessage = (msg: string) => {
     setMessage(msg);
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const handleEdit = (gift) => {
+  const handleEdit = (gift: Gift) => {
     setEditingId(gift.id);
     setNewGift({
       name: gift.name,
@@ -39,7 +46,7 @@ const GiftAdmin = () => {
     });
   };
 
-  const handleSave = (id) => {
+  const handleSave = (id: number | null) => {
     if (!newGift.name || !newGift.description || !newGift.probability) {
       showMessage('Please fill all fields');
       return;
@@ -69,7 +76,7 @@ const GiftAdmin = () => {
     showMessage('Gift saved successfully!');
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     setGifts(gifts.filter(gift => gift.id !== id));
     showMessage('Gift deleted successfully!');
   };
