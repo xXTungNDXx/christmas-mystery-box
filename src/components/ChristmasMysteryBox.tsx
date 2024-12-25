@@ -1,24 +1,32 @@
 "use client"
 
 import React, { useState } from 'react';
-import { Gift, GiftIcon, Share2, RefreshCw } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Gift, GiftIcon, Share2, RefreshCw, Settings } from 'lucide-react';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
+import { useGiftStore, Gift as GiftType } from '../store/giftStore';
+import Link from 'next/link';
 
 const ChristmasMysteryBox = () => {
+  const { gifts } = useGiftStore();
   const [selectedBox, setSelectedBox] = useState<number | null>(null);
-  const [revealedGift, setRevealedGift] = useState<{ name: string; description: string } | null>(null);
+  const [revealedGift, setRevealedGift] = useState<GiftType | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const gifts = [
-    { name: "Holiday Cruise", description: "A magical 7-day Caribbean cruise!" },
-    { name: "Gaming Console", description: "The latest gaming console with virtual reality!" },
-    { name: "Smart Home Bundle", description: "Transform your home with smart devices!" },
-    { name: "Luxury Watch", description: "A premium timepiece for your collection!" },
-    { name: "Adventure Package", description: "Skydiving and wilderness expedition!" },
-    { name: "Tech Gadget Set", description: "Latest smartphone and accessories!" }
-  ];
+  const selectRandomGift = () => {
+    const totalProbability = 100;
+    const randomNumber = Math.random() * totalProbability;
+    let cumulativeProbability = 0;
+
+    for (const gift of gifts) {
+      cumulativeProbability += gift.probability;
+      if (randomNumber <= cumulativeProbability) {
+        return gift;
+      }
+    }
+    return gifts[gifts.length - 1];
+  };
 
   const handleBoxSelect = (boxNumber: number) => {
     if (isAnimating || revealedGift) return;
@@ -27,8 +35,8 @@ const ChristmasMysteryBox = () => {
     setSelectedBox(boxNumber);
     
     setTimeout(() => {
-      const randomGift = gifts[Math.floor(Math.random() * gifts.length)];
-      setRevealedGift(randomGift);
+      const selectedGift = selectRandomGift();
+      setRevealedGift(selectedGift);
       setIsAnimating(false);
     }, 2000);
   };
@@ -47,9 +55,17 @@ const ChristmasMysteryBox = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-100 to-green-100 p-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center text-green-800 mb-8">
-          Christmas Mystery Box
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-center text-green-800 flex-grow">
+            Christmas Mystery Box
+          </h1>
+          <Link href="/admin">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Admin Panel
+            </Button>
+          </Link>
+        </div>
         
         {revealedGift ? (
           <div className="space-y-4">
@@ -111,6 +127,9 @@ const ChristmasMysteryBox = () => {
           </div>
         )}
       </div>
+      <footer className="text-center mt-12 text-sm text-gray-500">
+        <p>© 2024 Christmas Mystery Box. Made with ❤️ for the holidays</p>
+      </footer>
     </div>
   );
 };
